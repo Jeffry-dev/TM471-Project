@@ -15,7 +15,10 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'role' => \App\Http\Middleware\RequireRole::class,
+            'visitor.track' => \App\Http\Middleware\EnsureVisitorTracked::class,
         ]);
+
+        $middleware->appendToGroup('api', \Illuminate\Session\Middleware\StartSession::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
