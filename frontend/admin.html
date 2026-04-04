@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin — Dashboard</title>
+  <link rel="icon" type="image/jpeg" href="assets/media/site-logo-chef.jpg" />
+  <link rel="stylesheet" href="global.css?v=20260131" />
+  <script>
+    (function () {
+      try {
+        if (sessionStorage.getItem('__page_transition__') === '1') {
+          sessionStorage.removeItem('__page_transition__');
+          document.documentElement.classList.add('page-transition-enter');
+        }
+      } catch (e) {
+        // ignore
+      }
+    })();
+  </script>
+</head>
+<body>
+  <div id="navbar"></div>
+
+  <main class="mx-auto flex max-w-5xl flex-col gap-6 px-4 py-10">
+    <header class="reveal flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-[0.2em] text-muted-soft">Admin dashboard</p>
+        <h1 class="mt-2 text-3xl font-semibold tracking-tight heading-gradient">Cedars of Lebanon control panel</h1>
+        <p class="mt-2 text-sm text-muted-soft">Manage your Lebanese restaurant menu and settings in one place.</p>
+      </div>
+      <div class="flex gap-2 flex-wrap">
+        <a href="menu.html" class="btn btn-outline btn-pill text-xs">View public menu</a>
+      </div>
+    </header>
+
+    <div id="admin-banners" class="space-y-2"></div>
+
+    <section id="admin-profile-card" class="hidden surface-card rounded-2xl border border-subtle p-5 shadow-sm reveal">
+      <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div class="flex items-center gap-3">
+          <div id="admin-profile-avatar" class="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500 to-emerald-700 text-sm font-semibold text-white">?</div>
+          <div>
+            <p id="admin-profile-name" class="text-sm font-semibold text-[var(--text-main)]">Admin</p>
+            <p id="admin-profile-email" class="text-xs text-muted-soft"></p>
+            <p id="admin-profile-role-since" class="mt-1 text-[11px] uppercase tracking-[0.16em] text-muted-soft"></p>
+          </div>
+        </div>
+        <div class="flex gap-2">
+          <a href="admin-profile.html" class="btn btn-outline btn-pill text-xs">Edit profile</a>
+        </div>
+      </div>
+      <p id="admin-profile-bio" class="hidden mt-4 text-sm text-muted-soft"></p>
+    </section>
+
+    <section class="surface-card rounded-2xl border border-subtle p-5 shadow-sm reveal">
+      <h2 id="admin-form-title" class="text-sm font-semibold tracking-wide">Add new menu item</h2>
+      <p id="admin-form-sub" class="mt-1 text-xs text-muted-soft">Fill in the details below to add a new dish to the menu.</p>
+
+      <form id="admin-item-form" class="mt-4 grid gap-4 text-sm md:grid-cols-2">
+        <input type="hidden" name="id" />
+
+        <div class="md:col-span-1">
+          <label class="block text-xs font-medium text-muted-soft uppercase tracking-[0.16em]">Name</label>
+          <input
+            name="name"
+            type="text"
+            required
+            class="mt-1 w-full rounded-md border border-subtle bg-transparent px-3 py-2 shadow-sm focus:border-[var(--accent)] focus:outline-none"
+          />
+        </div>
+
+        <div class="md:col-span-1">
+          <label class="block text-xs font-medium text-muted-soft uppercase tracking-[0.16em]">Category</label>
+          <input
+            name="category"
+            type="text"
+            class="mt-1 w-full rounded-md border border-subtle bg-transparent px-3 py-2 text-sm shadow-sm focus:border-[var(--accent)] focus:outline-none"
+          />
+        </div>
+
+        <div class="md:col-span-2">
+          <label class="block text-xs font-medium text-muted-soft uppercase tracking-[0.16em]">Description</label>
+          <textarea
+            name="description"
+            class="mt-1 min-h-[80px] w-full rounded-md border border-subtle bg-transparent px-3 py-2 text-sm shadow-sm focus:border-[var(--accent)] focus:outline-none"
+          ></textarea>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-muted-soft uppercase tracking-[0.16em]">Ingredients</label>
+          <input
+            name="ingredients"
+            type="text"
+            placeholder="e.g. chickpeas, tahini, lemon"
+            class="mt-1 w-full rounded-md border border-subtle bg-transparent px-3 py-2 shadow-sm focus:border-[var(--accent)] focus:outline-none"
+          />
+          <p class="mt-1 text-[11px] text-muted-soft">Comma-separated list.</p>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-muted-soft uppercase tracking-[0.16em]">Allergens</label>
+          <input
+            name="allergens"
+            type="text"
+            placeholder="e.g. sesame, dairy, nuts"
+            class="mt-1 w-full rounded-md border border-subtle bg-transparent px-3 py-2 shadow-sm focus:border-[var(--accent)] focus:outline-none"
+          />
+          <p class="mt-1 text-[11px] text-muted-soft">Comma-separated list.</p>
+        </div>
+        <div class="md:col-span-2">
+          <label class="block text-xs font-medium text-muted-soft uppercase tracking-[0.16em]">Dietary tags</label>
+          <input
+            name="dietaryTags"
+            type="text"
+            placeholder="e.g. vegetarian, vegan, spicy, high-protein"
+            class="mt-1 w-full rounded-md border border-subtle bg-transparent px-3 py-2 shadow-sm focus:border-[var(--accent)] focus:outline-none"
+          />
+          <p class="mt-1 text-[11px] text-muted-soft">Comma-separated list.</p>
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-muted-soft uppercase tracking-[0.16em]">Price (USD)</label>
+          <input
+            name="price"
+            type="number"
+            step="0.01"
+            min="0"
+            required
+            class="mt-1 w-full rounded-md border border-subtle bg-transparent px-3 py-2 text-sm shadow-sm focus:border-[var(--accent)] focus:outline-none"
+          />
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-muted-soft uppercase tracking-[0.16em]">Image URL</label>
+          <input
+            name="imageUrl"
+            type="url"
+            placeholder="https://images.pexels.com/..."
+            class="mt-1 w-full rounded-md border border-subtle bg-transparent px-3 py-2 shadow-sm focus:border-[var(--accent)] focus:outline-none"
+          />
+        </div>
+
+        <div class="flex items-center gap-2 text-xs md:col-span-2">
+          <input
+            id="available"
+            name="isAvailable"
+            type="checkbox"
+            class="h-4 w-4 rounded border-subtle text-emerald-600 focus:ring-emerald-500"
+            checked
+          />
+          <label for="available" class="text-muted-soft">Available on the menu</label>
+        </div>
+
+        <div class="md:col-span-2 flex justify-end gap-2 flex-wrap">
+          <button id="admin-form-cancel" type="button" class="btn btn-outline btn-pill hidden">Cancel</button>
+          <button id="admin-form-submit" type="submit" class="btn btn-primary btn-pill">Add item</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="surface-card rounded-2xl border border-subtle p-5 shadow-sm reveal">
+      <div class="flex flex-col gap-4">
+        <div>
+          <h2 class="text-sm font-semibold tracking-wide">Existing menu items</h2>
+          <p class="mt-1 text-xs text-muted-soft">Toggle availability or remove dishes from the menu.</p>
+        </div>
+        <div id="admin-category-filters" class="flex flex-wrap gap-2"></div>
+      </div>
+
+      <div id="admin-items" class="mt-4 text-sm"></div>
+    </section>
+
+    <section class="surface-card rounded-2xl border border-subtle p-5 shadow-sm reveal">
+      <div>
+        <h2 class="text-sm font-semibold tracking-wide">Contact messages</h2>
+        <p class="mt-1 text-xs text-muted-soft">View submitted contact form messages from website visitors.</p>
+      </div>
+      <div id="admin-messages" class="mt-4 text-sm"></div>
+    </section>
+
+    <section class="surface-card rounded-2xl border border-subtle p-5 shadow-sm reveal">
+      <div>
+        <h2 class="text-sm font-semibold tracking-wide">Visitors</h2>
+        <p class="mt-1 text-xs text-muted-soft">Tracked visitor sessions (IP, user agent, first visit time).</p>
+      </div>
+      <div id="admin-visitors" class="mt-4 text-sm"></div>
+    </section>
+
+    <section class="surface-card rounded-2xl border border-subtle p-5 shadow-sm reveal">
+      <div>
+        <h2 class="text-sm font-semibold tracking-wide">Chat logs</h2>
+        <p class="mt-1 text-xs text-muted-soft">Chatbot questions/responses with visitor reference.</p>
+      </div>
+      <div id="admin-chat-logs" class="mt-4 text-sm"></div>
+    </section>
+  </main>
+
+  <div id="delete-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center px-4">
+    <div id="delete-modal-backdrop" class="absolute inset-0 bg-black/60"></div>
+    <div class="surface-card relative w-full max-w-md rounded-2xl border border-subtle p-5 shadow-2xl">
+      <p class="text-xs font-semibold uppercase tracking-[0.2em] text-muted-soft">Confirm</p>
+      <h2 class="mt-2 text-lg font-semibold tracking-tight">Delete menu item?</h2>
+      <p class="mt-2 text-sm text-muted-soft">This action cannot be undone. Are you sure you want to delete this menu item?</p>
+      <div class="mt-5 flex justify-end gap-2">
+        <button id="delete-modal-cancel" type="button" class="btn btn-outline btn-pill">Cancel</button>
+        <button id="delete-modal-confirm" type="button" class="btn btn-pill bg-red-500/80 text-white hover:bg-red-500">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="footer"></div>
+
+  <script src="global.js?v=20260131"></script>
+  <script src="assets/js/admin.js?v=20260131"></script>
+</body>
+</html>

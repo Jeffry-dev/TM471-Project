@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin — Profile</title>
+  <link rel="icon" type="image/jpeg" href="assets/media/site-logo-chef.jpg" />
+  <link rel="stylesheet" href="global.css?v=20260131" />
+  <script>
+    (function () {
+      try {
+        if (sessionStorage.getItem('__page_transition__') === '1') {
+          sessionStorage.removeItem('__page_transition__');
+          document.documentElement.classList.add('page-transition-enter');
+        }
+      } catch (e) {
+        // ignore
+      }
+    })();
+  </script>
+</head>
+<body>
+  <div id="navbar"></div>
+
+  <main class="mx-auto flex max-w-4xl flex-col gap-6 px-4 py-10">
+    <header class="reveal">
+      <p class="text-xs font-semibold uppercase tracking-[0.2em] text-muted-soft">Admin</p>
+      <h1 class="mt-2 text-3xl font-semibold tracking-tight heading-gradient">Edit profile</h1>
+      <p class="mt-2 text-sm text-muted-soft">Update your display name, bio, and avatar.</p>
+    </header>
+
+    <div id="admin-profile-error" class="hidden rounded-md border border-red-500/40 bg-red-500/5 px-3 py-2 text-xs text-red-500"></div>
+
+    <section class="surface-card rounded-2xl border border-subtle p-5 shadow-sm reveal">
+      <div id="profile-summary" class="flex items-center gap-3">
+        <div id="profile-avatar" class="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500 to-emerald-700 text-sm font-semibold text-white">?</div>
+        <div>
+          <p id="profile-email" class="text-sm font-semibold text-[var(--text-main)]">Loading…</p>
+          <p id="profile-role-since" class="mt-1 text-[11px] uppercase tracking-[0.16em] text-muted-soft"></p>
+        </div>
+      </div>
+
+      <form id="admin-profile-form" class="mt-4 grid gap-3 text-sm md:grid-cols-2">
+        <div>
+          <label class="block text-xs font-medium text-muted-soft uppercase tracking-[0.16em]">Display name</label>
+          <input name="name" type="text" class="mt-1 w-full rounded-md border border-subtle bg-transparent px-3 py-2 shadow-sm focus:border-[var(--accent)] focus:outline-none" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-muted-soft uppercase tracking-[0.16em]">Avatar URL (optional)</label>
+          <input name="avatarUrl" type="url" class="mt-1 w-full rounded-md border border-subtle bg-transparent px-3 py-2 shadow-sm focus:border-[var(--accent)] focus:outline-none" />
+        </div>
+
+        <div class="md:col-span-2">
+          <label class="block text-xs font-medium text-muted-soft uppercase tracking-[0.16em]">Bio</label>
+          <textarea name="bio" class="mt-1 min-h-[90px] w-full rounded-md border border-subtle bg-transparent px-3 py-2 text-sm shadow-sm focus:border-[var(--accent)] focus:outline-none"></textarea>
+        </div>
+
+        <div class="md:col-span-2 flex flex-wrap justify-end gap-2">
+          <a class="btn btn-outline btn-pill" href="admin.html">Cancel</a>
+          <button id="admin-profile-submit" type="submit" class="btn btn-primary btn-pill disabled:opacity-70">Save changes</button>
+        </div>
+
+        <p id="admin-profile-status" class="text-xs text-muted-soft md:col-span-2"></p>
+      </form>
+    </section>
+  </main>
+
+  <div id="footer"></div>
+
+  <script src="global.js?v=20260131"></script>
+  <script src="assets/js/admin-profile.js?v=20260131"></script>
+</body>
+</html>
