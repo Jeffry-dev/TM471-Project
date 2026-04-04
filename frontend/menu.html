@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cedars of Lebanon — Menu</title>
+  <link rel="icon" type="image/jpeg" href="assets/media/site-logo-chef.jpg" />
+  <link rel="stylesheet" href="global.css?v=20260131" />
+  <script>
+    (function () {
+      try {
+        if (sessionStorage.getItem('__page_transition__') === '1') {
+          sessionStorage.removeItem('__page_transition__');
+          document.documentElement.classList.add('page-transition-enter');
+        }
+      } catch (e) {
+        // ignore
+      }
+    })();
+  </script>
+</head>
+<body>
+  <div id="navbar"></div>
+
+  <main class="bg-transparent">
+    <div class="mx-auto max-w-7xl px-4 py-10">
+      <header class="mb-8">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--accent)]">Our Kitchen</p>
+          <h1 class="mt-2 text-3xl font-bold tracking-tight">Lebanese Menu</h1>
+          <p class="mt-2 text-sm text-muted-soft">Explore authentic Lebanese dishes from fresh mezze to charcoal-grilled specialties.</p>
+        </div>
+        <div class="mt-6 grid gap-3 md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
+          <div>
+            <label for="menu-search" class="sr-only">Search dishes</label>
+            <input
+              id="menu-search"
+              type="search"
+              placeholder="Search by dish name..."
+              class="w-full rounded-md border border-subtle bg-transparent px-3 py-2 text-sm shadow-sm focus:border-[var(--accent)] focus:outline-none"
+            />
+            <p id="menu-results-summary" class="mt-2 text-xs text-muted-soft"></p>
+          </div>
+
+          <div id="menu-filters" class="flex flex-wrap gap-2" aria-label="Menu category filters"></div>
+        </div>
+        <div id="menu-filters" class="mt-6 flex flex-wrap gap-2" aria-label="Menu category filters"></div>
+      </header>
+
+      <div id="menu-section" class="space-y-10">
+        <p class="text-muted-soft">Loading…</p>
+      </div>
+    </div>
+  </main>
+
+  <div id="footer"></div>
+
+  <script src="global.js?v=20260131"></script>
+  <script src="assets/js/menu.js?v=20260131"></script>
+</body>
+</html>

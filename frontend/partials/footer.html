@@ -1,0 +1,16 @@
+<footer class="border-t border-subtle surface-subtle backdrop-blur-sm">
+  <div class="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2 px-4 py-4 text-xs text-muted-soft">
+    <span>© <span id="year"></span> Cedars of Lebanon. All rights reserved.</span>
+    <span class="flex items-center gap-1">
+      <span class="h-1 w-1 rounded-full bg-[var(--accent-secondary)]"></span>
+      <span>Crafted with Laravel & SQLite.</span>
+    </span>
+  </div>
+</footer>
+
+<script>
+  (function () {
+    var el = document.getElementById('year');
+    if (el) el.textContent = String(new Date().getFullYear());
+  })();
+</script>
