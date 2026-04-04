@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cedars of Lebanon — Home</title>
+  <link rel="icon" type="image/jpeg" href="assets/media/site-logo-chef.jpg" />
+  <link rel="stylesheet" href="global.css?v=20260131" />
+  <script>
+    (function () {
+      try {
+        if (sessionStorage.getItem('__page_transition__') === '1') {
+          sessionStorage.removeItem('__page_transition__');
+          document.documentElement.classList.add('page-transition-enter');
+        }
+      } catch (e) {
+        // ignore
+      }
+    })();
+  </script>
+</head>
+<body>
+  <div id="navbar"></div>
+
+  <main class="bg-transparent">
+    <section class="mx-auto flex max-w-6xl flex-col items-start gap-10 px-4 py-16 md:flex-row md:items-center">
+      <div class="reveal flex-1 max-w-xl">
+        <p class="text-sm font-semibold uppercase tracking-[0.2em] text-muted-soft">Welcome to Cedars of Lebanon</p>
+        <h1 class="mt-3 text-4xl font-bold tracking-tight md:text-5xl">Authentic Lebanese cuisine in the heart of the city.</h1>
+        <p class="mt-4 max-w-xl text-base text-muted-soft">
+          Experience traditional mezze, charcoal-grilled meats, and family recipes passed down through generations
+          in a warm and inviting atmosphere.
+        </p>
+        <div class="mt-6 flex flex-wrap gap-3">
+          <a href="menu.html" class="btn btn-primary">View menu</a>
+          <a href="contact.html" class="btn btn-outline">Book a table</a>
+        </div>
+      </div>
+
+      <div class="reveal flex-1 w-full max-w-md self-stretch md:max-w-none">
+        <div class="surface-card group relative h-72 w-full overflow-hidden rounded-3xl border border-[var(--border)] bg-secondary shadow-xl md:h-80">
+          <div id="hero-carousel" class="absolute inset-0" aria-label="Image carousel"></div>
+          <div class="pointer-events-none absolute inset-0 bg-gradient-to-tr from-black/50 via-black/10 to-transparent"></div>
+          <div class="absolute bottom-4 left-4 space-y-1 text-sm text-foreground">
+            <p class="text-xs uppercase tracking-[0.18em] text-muted-foreground">Tonight's highlights</p>
+            <p class="font-medium">Mixed grill platter, fresh fattoush, and homemade baklava.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="mx-auto mt-2 max-w-6xl px-4">
+      <div class="rounded-2xl border border-subtle surface-subtle backdrop-blur">
+        <div class="mx-auto grid max-w-5xl gap-8 px-4 py-10 md:grid-cols-3">
+        <div class="reveal">
+          <h2 class="text-base font-semibold tracking-tight">Fresh ingredients</h2>
+          <p class="mt-2 text-sm text-muted-soft">
+            We source the finest Mediterranean ingredients and spices to bring authentic Lebanese flavors to your table.
+          </p>
+        </div>
+        <div class="reveal">
+          <h2 class="text-base font-semibold tracking-tight">Warm hospitality</h2>
+          <p class="mt-2 text-sm text-muted-soft">
+            Experience Lebanese hospitality with attentive service, traditional décor, and a welcoming atmosphere.
+          </p>
+        </div>
+        <div class="reveal">
+          <h2 class="text-base font-semibold tracking-tight">Perfect for any occasion</h2>
+          <p class="mt-2 text-sm text-muted-soft">
+            From date nights to family dinners, we have space and dishes for everyone.
+          </p>
+        </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="mx-auto mt-6 max-w-6xl px-4 pb-16">
+      <div class="grid gap-6 md:grid-cols-[minmax(0,2fr)_minmax(0,1.1fr)]">
+        <div class="surface-card rounded-2xl border border-subtle p-5 shadow-sm reveal">
+          <h2 class="text-base font-semibold tracking-tight">Lebanese feast menu</h2>
+          <p class="mt-2 text-sm text-muted-soft">
+            Experience the best of Lebanese cuisine with our chef's curated feast featuring mezze, grills, and desserts.
+            Perfect for sharing with family and friends.
+          </p>
+          <ul class="mt-4 space-y-1 text-sm text-muted-soft">
+            <li>• Mezze platter with hummus, baba ghanoush, tabbouleh & fattoush</li>
+            <li>• Fresh manakish & warm pita bread</li>
+            <li>• Mixed grill with lamb, chicken & kafta</li>
+            <li>• Selection of traditional Lebanese desserts & Arabic coffee</li>
+          </ul>
+          <p class="mt-4 text-sm font-semibold">From $45 per person</p>
+        </div>
+
+        <div class="surface-card flex flex-col justify-between rounded-2xl border border-subtle p-5 text-sm shadow-sm reveal">
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-muted-soft">Opening hours</p>
+            <div class="mt-3 space-y-1">
+              <div class="flex justify-between">
+                <span>Mon–Thu</span>
+                <span class="text-muted-soft">12:00 – 22:00</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Fri–Sat</span>
+                <span class="text-muted-soft">12:00 – 23:00</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Sun</span>
+                <span class="text-muted-soft">12:00 – 21:00</span>
+              </div>
+            </div>
+          </div>
+          <div class="mt-4 rounded-xl bg-gradient-to-r from-primary to-[hsl(175_80%_60%)] px-4 py-3 text-xs font-medium text-[var(--bg)] shadow-sm">
+            Walk-ins are welcome, but reservations are recommended on weekends.
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="footer"></div>
+
+  <script src="global.js?v=20260131"></script>
+  <script src="assets/js/home.js?v=20260131"></script>
+</body>
+</html>
