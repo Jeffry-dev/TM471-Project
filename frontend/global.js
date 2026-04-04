@@ -205,8 +205,8 @@ window.APP_CONFIG = window.APP_CONFIG || {
 // Fallback HTML so navigation/footer still show even when running pages via file://
 // (fetch() often fails in that case).
 const FALLBACK_NAV_HTML = `
-<header id="motion-header" class="sticky top-0 z-20 border-b border-subtle transition-all duration-500 bg-transparent">
-  <nav id="motion-nav" class="mx-auto flex max-w-6xl items-center justify-between px-4 transition-all duration-500 py-4">
+<header id="app-header" class="sticky top-0 z-20 border-b border-subtle transition-all duration-500 bg-transparent">
+  <nav id="app-nav" class="mx-auto flex max-w-6xl items-center justify-between px-4 transition-all duration-500 py-4">
     <a href="home.html" class="text-lg font-semibold tracking-tight text-[var(--text-main)]" aria-label="Home">
       <span class="rounded-full bg-[var(--accent)] px-2 py-0.5 text-xs font-bold uppercase tracking-[0.2em] text-[var(--bg)] mr-2">🌲</span>
       Cedars of Lebanon
@@ -265,8 +265,8 @@ function setActiveNavLink() {
 }
 
 function bindHeaderScroll() {
-  const header = document.getElementById('motion-header');
-  const nav = document.getElementById('motion-nav');
+  const header = document.getElementById('app-header');
+  const nav = document.getElementById('app-nav');
   if (!header || !nav) return;
 
   const onScroll = () => {
@@ -398,9 +398,7 @@ function renderAuthLinks() {
 // Cache-busting / versioning for partial fetches.
 const ASSET_VERSION = '20260131-1';
 
-// The original Next app includes a PageCurtain component, but in practice the UX you want
-// for this static build is the smooth blur/scale transition without a large teal overlay.
-// Leave this disabled unless you explicitly want the curtain effect.
+// Disable the page curtain effect - using smooth blur/scale transitions for navigation instead.
 const ENABLE_PAGE_CURTAIN = false;
 
 function ensureCurtain() {
@@ -428,7 +426,7 @@ const PAGE_TRANSITION_KEY = '__page_transition__';
 const CHAT_STORAGE_KEY = 'cedars_ai_chat_history_v1';
 
 function navigateWithTransition(href, delayMs = 300) {
-  // PageTransition exit (approximation) + PageCurtain.
+  // Trigger page exit animation and navigate to the new page.
   try {
     sessionStorage.setItem(PAGE_TRANSITION_KEY, '1');
   } catch {
@@ -465,9 +463,8 @@ function bindPageTransitions() {
 }
 
 function bindPageEnterTransition() {
-  // PageTransition enter (approximation).
-  // IMPORTANT: start the transition synchronously to avoid "stuck blurred" states
-  // when other scripts are busy (menu rendering, image decode, etc.).
+  // Apply page enter animation synchronously to ensure smooth transitions
+  // and prevent lag caused by other scripts.
   document.body.classList.add('page-enter');
 
   // Force reflow so the browser commits the initial state before enabling transitions.

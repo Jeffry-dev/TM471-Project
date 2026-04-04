@@ -3,7 +3,7 @@
 */
 @import url("assets/css/app.css");
 
-/* Make sure Tailwind arbitrary border class used in the original has a value. */
+/* CSS variable for border styling. */
 :root {
   --border: var(--border-subtle);
 }
@@ -19,14 +19,13 @@ body {
 .text-foreground { color: var(--text-main); }
 .text-muted-foreground { color: var(--text-muted); }
 
-/* The original admin page uses btn-xs; the compiled CSS bundle only has btn-sm. */
+/* Button size utility for extra small buttons. */
 .btn-xs { padding: 0.35rem 0.9rem; font-size: 0.75rem; }
 
 /*
-  PageTransition (vanilla approximation of the original framer-motion PageTransition).
-
-  To avoid a "flash" / double-render during navigation (full page reload), we set a class
-  on <html> *before first paint* when a transition is in progress.
+  Page transition animation effect.
+  Uses CSS classes to animate page enter/exit with smooth opacity and scale transforms.
+  Applied via JavaScript to avoid visual flashing during full page reloads.
 */
 html.page-transition-enter body main {
   opacity: 0;
@@ -56,7 +55,7 @@ body.page-exit main {
   will-change: transform, opacity;
 }
 
-/* AnimatedSection (reveal-on-scroll) replacement. */
+/* Reveal-on-scroll animation - elements fade in when they enter the viewport. */
 .reveal {
   opacity: 0;
   transform: translateY(18px);
@@ -69,7 +68,7 @@ body.page-exit main {
   will-change: transform, opacity;
 }
 
-/* Home carousel (vanilla replacement for framer-motion AnimatePresence fade). */
+/* Hero carousel slide transitions with fade effect. */
 #hero-carousel {
   position: absolute;
   inset: 0;
@@ -163,7 +162,7 @@ body.page-exit main {
   transform: rotateY(180deg) translateY(-8px) scale(1.02);
 }
 
-/* Simple gradient/glow animation (replacement for framer background animation). */
+/* Auth page background gradient and glow animations. */
 .auth-brand-bg {
   background-size: 200% 200%;
   animation: authGradient 8s linear infinite;
@@ -184,7 +183,7 @@ body.page-exit main {
   50% { opacity: 0.35; }
 }
 
-/* Page-to-page transition curtain (vanilla replacement for framer-motion PageCurtain). */
+/* Page transition curtain overlay - animated gradient panels for page navigation. */
 #page-curtain {
   position: fixed;
   inset: 0;
