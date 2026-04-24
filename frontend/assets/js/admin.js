@@ -137,6 +137,23 @@ function setText(id, text) {
   el.textContent = text || '';
 }
 
+function setCountBadge(id, count) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = count || 0;
+}
+
+function showAdminPanel(panelId) {
+  document.querySelectorAll('.admin-panel').forEach((p) => p.classList.add('hidden'));
+  document.querySelectorAll('.admin-nav-item').forEach((b) => b.classList.remove('admin-nav-item--active'));
+
+  const panel = document.getElementById(panelId);
+  if (panel) panel.classList.remove('hidden');
+
+  const btn = document.querySelector(`.admin-nav-item[data-panel="${panelId}"]`);
+  if (btn) btn.classList.add('admin-nav-item--active');
+}
+
 function setHidden(id, hidden) {
   const el = document.getElementById(id);
   if (!el) return;
@@ -352,7 +369,7 @@ function renderItemsList() {
 
     article.classList.add('reveal');
 
-    list.appendChild(article);
+     list.appendChild(article);
   });
 
   host.appendChild(list);
@@ -676,6 +693,10 @@ async function reload() {
   state.visitors = visitors;
   state.chatLogs = chatLogs;
 
+  setCountBadge('count-messages', state.messages.length);
+  setCountBadge('count-visitors', state.visitors.length);
+  setCountBadge('count-chat', state.chatLogs.length);
+
   renderProfileCard();
   rerenderItemsOnly();
   renderMessagesList();
@@ -773,6 +794,21 @@ document.addEventListener('DOMContentLoaded', () => {
   if (modalCancel) modalCancel.addEventListener('click', closeDeleteModal);
   if (modalBackdrop) modalBackdrop.addEventListener('click', closeDeleteModal);
   if (modalConfirm) modalConfirm.addEventListener('click', () => void confirmDelete());
+
+  // Admin nav panel toggles
+  document.querySelectorAll('.admin-nav-item').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const panelId = btn.dataset.panel;
+      const isActive = btn.classList.contains('admin-nav-item--active');
+      if (isActive) {
+        btn.classList.remove('admin-nav-item--active');
+        const panel = document.getElementById(panelId);
+        if (panel) panel.classList.add('hidden');
+      } else {
+        showAdminPanel(panelId);
+      }
+    });
+  });
 
   // initial mode
   setFormMode(false);

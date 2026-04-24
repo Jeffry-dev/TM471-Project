@@ -26,7 +26,7 @@
     <header class="reveal flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
       <div>
         <p class="text-xs font-semibold uppercase tracking-[0.2em] text-muted-soft">Admin dashboard</p>
-        <h1 class="mt-2 text-3xl font-semibold tracking-tight heading-gradient">Cedars of Lebanon control panel</h1>
+        <h1 class="mt-2 text-3xl font-semibold tracking-tight text-[var(--accent)]">Cedars of Lebanon control panel</h1>
         <p class="mt-2 text-sm text-muted-soft">Manage your Lebanese restaurant menu and settings in one place.</p>
       </div>
       <div class="flex gap-2 flex-wrap">
@@ -170,27 +170,45 @@
     </section>
 
     <section class="surface-card rounded-2xl border border-subtle p-5 shadow-sm reveal">
-      <div>
-        <h2 class="text-sm font-semibold tracking-wide">Contact messages</h2>
-        <p class="mt-1 text-xs text-muted-soft">View submitted contact form messages from website visitors.</p>
+      <div class="grid gap-3 md:grid-cols-3">
+        <button type="button" id="nav-messages" class="admin-nav-item" data-panel="panel-messages">
+          <span class="admin-nav-item__icon">📩</span>
+          <span class="admin-nav-item__label">Contact messages</span>
+          <span id="count-messages" class="admin-nav-item__count">0</span>
+        </button>
+        <button type="button" id="nav-visitors" class="admin-nav-item" data-panel="panel-visitors">
+          <span class="admin-nav-item__icon">👁️</span>
+          <span class="admin-nav-item__label">Visitors</span>
+          <span id="count-visitors" class="admin-nav-item__count">0</span>
+        </button>
+        <button type="button" id="nav-chat" class="admin-nav-item" data-panel="panel-chat">
+          <span class="admin-nav-item__icon">💬</span>
+          <span class="admin-nav-item__label">Chat logs</span>
+          <span id="count-chat" class="admin-nav-item__count">0</span>
+        </button>
       </div>
-      <div id="admin-messages" class="mt-4 text-sm"></div>
-    </section>
 
-    <section class="surface-card rounded-2xl border border-subtle p-5 shadow-sm reveal">
-      <div>
-        <h2 class="text-sm font-semibold tracking-wide">Visitors</h2>
-        <p class="mt-1 text-xs text-muted-soft">Tracked visitor sessions (IP, user agent, first visit time).</p>
+      <div id="panel-messages" class="admin-panel hidden mt-4">
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="text-sm font-semibold tracking-wide">Contact messages</h2>
+          <p class="text-xs text-muted-soft">Submitted via the contact form</p>
+        </div>
+        <div id="admin-messages" class="text-sm"></div>
       </div>
-      <div id="admin-visitors" class="mt-4 text-sm"></div>
-    </section>
-
-    <section class="surface-card rounded-2xl border border-subtle p-5 shadow-sm reveal">
-      <div>
-        <h2 class="text-sm font-semibold tracking-wide">Chat logs</h2>
-        <p class="mt-1 text-xs text-muted-soft">Chatbot questions/responses with visitor reference.</p>
+      <div id="panel-visitors" class="admin-panel hidden mt-4">
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="text-sm font-semibold tracking-wide">Visitors</h2>
+          <p class="text-xs text-muted-soft">IP, user agent & visit time</p>
+        </div>
+        <div id="admin-visitors" class="text-sm"></div>
       </div>
-      <div id="admin-chat-logs" class="mt-4 text-sm"></div>
+      <div id="panel-chat" class="admin-panel hidden mt-4">
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="text-sm font-semibold tracking-wide">Chat logs</h2>
+          <p class="text-xs text-muted-soft">Bot questions & responses</p>
+        </div>
+        <div id="admin-chat-logs" class="text-sm"></div>
+      </div>
     </section>
   </main>
 
