@@ -29,6 +29,11 @@ class RestaurantAiChatService
             return ['reply' => self::OUT_OF_SCOPE_MESSAGE];
         }
 
+        $directReply = $this->handleDirectIntents($cleanMessage, $context);
+        if ($directReply !== null) {
+            return ['reply' => $directReply];
+        }
+
         $apiKey = (string) config('services.llm.api_key', '');
         if ($apiKey === '') {
             throw new \RuntimeException('LLM_API_KEY is missing');
@@ -94,7 +99,78 @@ Rules:
    “I don’t have verified information for that yet.”
 4) Recommend only dishes that exist in provided data.
 5) Keep answers concise, helpful, and polite.
+6) When the user asks for "the menu" or "what do you have", list dishes by category with their prices. Use bullet points.
 PROMPT;
+    }
+
+    private function handleDirectIntents(string $message, array $context): ?string
+    {
+        $low = Str::lower($message);
+
+        // 1. Menu Logic (Highest Priority)
+        // Handles full menu and categories strictly to avoid LLM token usage and ensure formatting.
+        if (preg_match('/\b(menu|what do you have|what do you serve)\b/', $low)) {
+            // Sub-check for Categories
+            if (preg_match('/\b(categories|types of food)\b/', $low)) {
+                $cats = $context['categories'] ?? [];
+                return 'We serve: '.implode(', ', $cats).'.';
+            }
+            // Full Menu List
+            $lines = ["Here is our menu:"];
+            foreach ($context['menu_items'] ?? [] as $item) {
+                if (! ($item['is_available'] ?? true)) {
+                    continue;
+                }
+                $lines[] = '• '.$item['name'].' – '.$item['category'].' – $'.number_format($item['price'] ?? 0, 2);
+                if (! empty($item['description'])) {
+                    $lines[] = '  '.$item['description'];
+                }
+            }
+            return implode("\n", $lines);
+        }
+
+        // 2. Hours Logic
+        // Strict checks to avoid matching "What are you" or "Where are you".
+        if (preg_match('/\b(hours|when do you open|when do you close|opening times|open today|what are your hours|when are you open)\b/', $low)) {
+            $hours = $context['restaurant']['hours'] ?? [];
+            if (! empty($hours)) {
+                $lines = ['Our hours:'];
+                foreach ($hours as $slot) {
+                    $days = $slot['days'] ?? '';
+                    $open = $slot['open'] ?? '';
+                    $close = $slot['close'] ?? '';
+                    if ($days && $open && $close) {
+                        $lines[] = "• $days: $open – $close";
+                    }
+                }
+                return implode("\n", $lines);
+            }
+        }
+
+        // 3. Location Logic
+        // Handles address queries directly.
+        if (preg_match('/\b(location|address|where are you|how to get there|where is the restaurant|where are you located)\b/', $low)) {
+            $loc = $context['restaurant']['location'] ?? [];
+            if (! empty($loc)) {
+                return 'We are located at: '.implode(', ', $loc).'.';
+            }
+        }
+
+        // 4. Identity Logic
+        // Answers "Who are you" specifically.
+        if (preg_match('/\b(who are you|what are you|your name|introduce yourself)\b/', $low)) {
+            return "I'm the Cedars of Lebanon restaurant assistant. I can help you with our menu, ingredients, allergens, dietary options, opening hours, and location. What would you like to know?";
+        }
+
+        // 5. Purpose Logic
+        // Answers "Why do you exist".
+        if (preg_match('/\b(meaningful|meaning|purpose|role|function|why are you here|why do you exist|who created you|who made you)\b/', $low)) {
+            return "My purpose is to assist you with the Cedars of Lebanon restaurant. I can help you find dishes, check ingredients and allergens, recommend meals based on your preferences, and answer questions about our hours and location.";
+        }
+
+        // All other queries (Recommendations, "Tell me about X", etc.) fall through to the LLM.
+        // This ensures intelligent handling of complex queries while keeping simple data lookups fast.
+        return null;
     }
 
     private function buildContext(): array
@@ -242,6 +318,19 @@ PROMPT;
             'protein',
             'cedars',
             'lebanon',
+            'restaurant',
+            'place',
+            'who',
+            'what',
+            'help',
+            'know',
+            'tell',
+            'about',
+            'can you',
+            'do you',
+            'your name',
+            'about you',
+            'introduce',
         ];
 
         foreach ($restaurantScopeKeywords as $keyword) {
