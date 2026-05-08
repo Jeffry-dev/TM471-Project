@@ -3,12 +3,12 @@
 return [
     'name' => 'Cedars of Lebanon',
     'location' => [
-        'address_line_1' => '123 Market Street',
-        'address_line_2' => 'Your City, YC 12345',
+        'address_line_1' => 'Jounieh Souk Street',
+        'address_line_2' => 'Jounieh, JN 12345',
     ],
     'contact' => [
-        'phone' => '(555) 123-4567',
-        'email' => null,
+        'phone' => '+961 03 444 111',
+        'email' => 'info@cedarsoflebanon.com',
     ],
     'hours' => [
         ['days' => 'Mon–Thu', 'open' => '12:00', 'close' => '22:00'],
