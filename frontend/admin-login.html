@@ -1,26 +1,29 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Admin — Login</title>
   <link rel="icon" type="image/jpeg" href="assets/media/site-logo-chef.jpg" />
-  <link rel="stylesheet" href="global.css?v=20260131" />
-  <script>
-    (function () {
-      try {
-        if (sessionStorage.getItem('__page_transition__') === '1') {
-          sessionStorage.removeItem('__page_transition__');
-          document.documentElement.classList.add('page-transition-enter');
-        }
-      } catch (e) {
-        // ignore
-      }
-    })();
-  </script>
+  <link rel="stylesheet" href="global.css" />
 </head>
-<body class="min-h-screen flex flex-col" style="min-height:100vh;display:flex;flex-direction:column;">
-  <div id="navbar"></div>
+<body class="min-h-screen flex flex-col">
+  <!-- Header / Navbar -->
+  <header id="app-header" class="sticky top-0 z-20 border-b border-subtle bg-transparent">
+    <nav id="app-nav" class="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
+      <a href="home.html" class="text-lg font-semibold tracking-tight text-[var(--text-main)]">
+        <span class="rounded-full bg-[var(--accent)] px-2 py-0.5 text-xs font-bold uppercase tracking-[0.2em] text-[var(--bg)] mr-2">🌲</span>
+        Cedars of Lebanon
+      </a>
+      <div class="flex items-center gap-3 text-sm font-medium text-muted-soft">
+        <a class="nav-item" data-nav-link href="home.html">Home</a>
+        <a class="nav-item" data-nav-link href="menu.html">Menu</a>
+        <a class="nav-item" data-nav-link href="about.html">About</a>
+        <a class="nav-item" data-nav-link href="contact.html">Contact</a>
+        <span id="auth-slot"></span>
+      </div>
+    </nav>
+  </header>
 
   <main class="bg-transparent flex-1 flex" style="flex:1 0 auto;display:flex;">
     <div class="mx-auto flex w-full max-w-6xl items-center justify-center px-4 py-12">
@@ -119,7 +122,7 @@
             <div class="p-8 sm:p-10">
               <p class="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--accent)]">Admin access</p>
               <h2 class="mt-2 text-2xl font-semibold tracking-tight text-white">Forgot password</h2>
-              <p class="mt-1 text-sm text-muted-soft">Enter your admin email and we’ll send a password reset link.</p>
+              <p class="mt-1 text-sm text-muted-soft">Enter your admin email and we'll send a password reset link.</p>
 
               <p id="admin-forgot-error" class="hidden mt-4 rounded-md border border-red-500/40 bg-red-500/5 px-3 py-2 text-xs text-red-500"></p>
               <p id="admin-forgot-info" class="hidden mt-4 rounded-md border border-emerald-500/40 bg-emerald-500/5 px-3 py-2 text-xs text-emerald-600 dark:text-emerald-400"></p>
@@ -154,9 +157,18 @@
     </div>
   </main>
 
-  <div id="footer" style="margin-top:auto;"></div>
+  <!-- Footer -->
+  <footer class="border-t border-subtle surface-subtle backdrop-blur-sm" style="margin-top:auto;">
+    <div class="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2 px-4 py-4 text-xs text-muted-soft">
+      <span>© 2026 Cedars of Lebanon. All rights reserved.</span>
+      <span class="flex items-center gap-1">
+        <span class="h-1 w-1 rounded-full bg-[var(--accent-secondary)]"></span>
+        <span>Crafted with Laravel & SQLite.</span>
+      </span>
+    </div>
+  </footer>
 
-  <script src="global.js?v=20260131"></script>
-  <script src="assets/js/admin-login.js?v=20260131"></script>
+  <script src="global.js"></script>
+  <script src="assets/js/admin-login.js"></script>
 </body>
 </html>

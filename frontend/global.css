@@ -19,6 +19,18 @@ body {
 .text-foreground { color: var(--text-main); }
 .text-muted-foreground { color: var(--text-muted); }
 
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
 /* Button size utility for extra small buttons. */
 .btn-xs { padding: 0.35rem 0.9rem; font-size: 0.75rem; }
 
@@ -479,4 +491,30 @@ body.page-exit main {
 
 .admin-panel {
   animation: fade-in-up 0.3s ease-out;
+}
+
+.dashboard-section {
+  background-color: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: 1rem;
+  padding: 1.25rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  transition: transform .5s cubic-bezier(.34, 1.56, .64, 1), box-shadow .5s, border-color .3s;
+}
+
+.dashboard-section:hover {
+  border-color: #1ae6d44d;
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 20px 60px #00c8c840, 0 0 40px #00c8c81a;
+}
+
+.dashboard-section.reveal,
+.dashboard-section.reveal.is-visible {
+  transition: transform .5s cubic-bezier(.34, 1.56, .64, 1), box-shadow .5s, border-color .3s, opacity 600ms ease-out;
+}
+
+.dashboard-section.reveal.is-visible:hover {
+  border-color: #1ae6d44d;
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 20px 60px #00c8c840, 0 0 40px #00c8c81a;
 }
