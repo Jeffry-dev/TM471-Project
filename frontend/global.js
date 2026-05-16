@@ -93,6 +93,9 @@ function buildChatWidget() {
 
   let history = readChatHistory();
   let isWaiting = false;
+  const CHAT_GENERIC_ERROR = 'Sorry, I’m having trouble right now. Please try again in a moment.';
+  const HISTORY_WINDOW_SIZE = 12;
+  const HISTORY_ITEM_MAX_CHARS = 4000;
 
   const addMessage = (role, content, createdAt = new Date().toISOString()) => {
     const article = document.createElement('article');
@@ -138,6 +141,23 @@ function buildChatWidget() {
     addMessage(role, content, entry.createdAt);
   };
 
+  const buildPayloadHistory = (fullHistory, currentMessage) => {
+    const normalized = fullHistory
+      .slice(-HISTORY_WINDOW_SIZE)
+      .map((entry) => ({
+        role: entry.role === 'assistant' ? 'assistant' : 'user',
+        content: String(entry.content || '').trim().slice(0, HISTORY_ITEM_MAX_CHARS),
+      }))
+      .filter((entry) => entry.content.length > 0);
+
+    const lastEntry = normalized[normalized.length - 1];
+    if (lastEntry && lastEntry.role === 'user' && lastEntry.content === currentMessage) {
+      normalized.pop();
+    }
+
+    return normalized;
+  };
+
   if (toggle && panel) {
     toggle.addEventListener('click', () => {
       const open = panel.classList.contains('hidden');
@@ -167,13 +187,14 @@ function buildChatWidget() {
       setTyping(true);
 
       try {
-        const payloadHistory = history
-          .slice(-12)
-          .map((entry) => ({ role: entry.role, content: entry.content }));
+        const payloadHistory = buildPayloadHistory(history, message);
 
         const response = await fetch(`${window.APP_CONFIG.API_BASE_URL}/ai/chat`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
           credentials: 'include',
           body: JSON.stringify({
             message,
@@ -182,13 +203,27 @@ function buildChatWidget() {
         });
 
         const body = await response.json().catch(() => ({}));
-        const reply = String(body.reply || '').trim() || 'Sorry, I’m having trouble right now. Please try again in a moment.';
+        if (!response.ok) {
+          if (response.status === 429) {
+            throw new Error('Too many requests right now. Please wait a moment and try again.');
+          }
+          if (response.status === 422) {
+            throw new Error(String(body.message || 'I could not process that message. Please try a shorter prompt.'));
+          }
+          throw new Error(String(body.reply || body.message || CHAT_GENERIC_ERROR));
+        }
+
+        const reply = String(body.reply || '').trim();
+        if (!reply) {
+          throw new Error(CHAT_GENERIC_ERROR);
+        }
         setTyping(false);
         pushAndPersist('assistant', reply);
       } catch (err) {
         console.warn(err);
         setTyping(false);
-        pushAndPersist('assistant', 'Sorry, I’m having trouble right now. Please try again in a moment.');
+        const errorMessage = err instanceof Error ? String(err.message || '').trim() : '';
+        pushAndPersist('assistant', errorMessage || CHAT_GENERIC_ERROR);
       } finally {
         isWaiting = false;
       }
@@ -217,6 +252,16 @@ const FALLBACK_NAV_HTML = `
       <a class="nav-item" data-nav-link href="about.html">About</a>
       <a class="nav-item" data-nav-link href="contact.html">Contact</a>
       <span id="auth-slot"></span>
+      <a
+        class="nav-item"
+        href="https://wa.me/9613444111"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Contact us on WhatsApp"
+        title="Contact us on WhatsApp"
+      >
+        Contact Us
+      </a>
     </div>
   </nav>
 </header>
