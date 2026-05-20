@@ -19,7 +19,10 @@ Route::get('/categories', [CategoryController::class, 'index']);
 Route::get('/categories/{id}', [CategoryController::class, 'show'])->whereNumber('id');
 // Contact message endpoint for users to submit messages without authentication
 Route::post('/contact-messages', [ContactMessageController::class, 'store']);
-// AI chat endpoint for users to interact with the restaurant's AI assistant without authentication. Apply rate limiting to prevent abuse, allowing a maximum of 5 requests per minute per IP address.
+// AI chat endpoint — where the frontend widget sends user messages.
+// Calls AiChatController, which validates input, asks the AI service for a reply,
+// logs the conversation, and returns the reply JSON.
+// Rate limited to 5 requests/min per IP to prevent abuse.
 Route::post('/ai/chat', AiChatController::class)->middleware(['visitor.track', 'throttle:ai-chat']);
 // Authentication endpoints for admin users to log in and manage the menu, categories, and contact messages. Apply authentication middleware to protect these endpoints and ensure that only authenticated admin users can access them.
 Route::prefix('auth')->group(function () {
