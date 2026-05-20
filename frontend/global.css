@@ -34,6 +34,49 @@ body {
 /* Button size utility for extra small buttons. */
 .btn-xs { padding: 0.35rem 0.9rem; font-size: 0.75rem; }
 
+/* Distinct navbar CTA for WhatsApp Contact Us button. */
+.nav-item.nav-item--contact-cta {
+  color: #04100d;
+  background: linear-gradient(135deg, var(--accent) 0%, hsl(175 88% 58%) 55%, hsl(164 82% 66%) 100%);
+  border-color: color-mix(in srgb, var(--accent) 68%, white 32%);
+  border-radius: 999px;
+  padding: 0.38rem 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.24), 0 0 22px rgba(26, 230, 212, 0.24);
+  transition:
+    transform 180ms ease,
+    box-shadow 220ms ease,
+    filter 220ms ease,
+    border-color 220ms ease;
+}
+
+.nav-item.nav-item--contact-cta::after {
+  background-color: transparent;
+}
+
+.nav-item.nav-item--contact-cta:hover {
+  color: #020807;
+  transform: translateY(-2px) scale(1.02);
+  filter: saturate(1.05) brightness(1.03);
+  border-color: color-mix(in srgb, var(--accent) 62%, white 38%);
+  box-shadow: 0 16px 30px rgba(0, 0, 0, 0.28), 0 0 26px rgba(26, 230, 212, 0.34);
+}
+
+.nav-item.nav-item--contact-cta:hover::after {
+  background-color: transparent;
+}
+
+.nav-item.nav-item--contact-cta:active {
+  transform: translateY(-1px) scale(1.01);
+}
+
+.nav-item.nav-item--contact-cta:focus-visible {
+  color: #020807;
+  outline: 2px solid color-mix(in srgb, var(--accent) 62%, white 38%);
+  outline-offset: 2px;
+}
+
 /*
   Page transition animation effect.
   Uses CSS classes to animate page enter/exit with smooth opacity and scale transforms.

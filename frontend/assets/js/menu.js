@@ -37,23 +37,22 @@ function categoryOrderIndex(cat) {
   return idx === -1 ? 999 : idx;
 }
 
-function renderFilters(categories, selected, onSelect) {
+function renderFilters(categories, selected, categoryCounts, totalCount, onSelect) {
   const host = document.getElementById('menu-filters');
   if (!host) return;
 
   host.innerHTML = '';
-
-  const mkBtn = (label, value) => {
+  const mkBtn = (value, count, label = value) => {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = `category-pill ${selected === value ? 'category-pill--active' : ''}`;
-    btn.textContent = label;
+    btn.textContent = `${label} (${count})`;
+    btn.setAttribute('aria-pressed', selected === value ? 'true' : 'false');
     btn.addEventListener('click', () => onSelect(value));
     return btn;
   };
-
-  host.appendChild(mkBtn('All', 'all'));
-  categories.forEach((c) => host.appendChild(mkBtn(c, c)));
+  host.appendChild(mkBtn('all', totalCount, 'All'));
+  categories.forEach((c) => host.appendChild(mkBtn(c, categoryCounts[c] || 0, c)));
 }
 
 function renderMenu(byCategory, displayedCategories) {
@@ -177,6 +176,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     const allItems = Array.isArray(items) ? items : [];
     const allByCategory = groupByCategory(allItems);
     const categories = Object.keys(allByCategory).sort((a, b) => categoryOrderIndex(a) - categoryOrderIndex(b));
+    const categoryCounts = categories.reduce((acc, cat) => {
+      acc[cat] = (allByCategory[cat] || []).length;
+      return acc;
+    }, {});
 
     const searchInput = document.getElementById('menu-search');
     const summaryEl = document.getElementById('menu-results-summary');
@@ -195,7 +198,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         ? Object.keys(filteredByCategory).sort((a, b) => categoryOrderIndex(a) - categoryOrderIndex(b))
         : (filteredByCategory[selected] ? [selected] : []);
 
-      renderFilters(categories, selected, (v) => {
+      renderFilters(categories, selected, categoryCounts, allItems.length, (v) => {
         selected = v;
         update();
         const menuSection = document.getElementById('menu-section');

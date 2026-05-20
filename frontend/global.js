@@ -1,6 +1,16 @@
-// global.js
-
-// Configure API base in one place.
+// ============================================================================
+// global.js — Shared Frontend Utilities & AI Chat Widget
+// ============================================================================
+// Hi! This file runs on every public page (Home, Menu, About, Contact).
+// It handles:
+//   - Navbar / footer injection
+//   - Page transitions & scroll animations
+//   - Auth state (login / logout dropdown)
+//   - THE AI CHAT WIDGET 💬 (build, open/close, send messages, remember history)
+//
+// The chat widget talks to the backend at: POST /api/ai/chat
+// This is the "face" of the AI — what users actually see and type into!
+// ============================================================================
 let savedApiBase = null;
 try {
   savedApiBase = localStorage.getItem('api_base_url');
@@ -52,6 +62,12 @@ function saveChatHistory(history) {
   }
 }
 
+/**
+ * Build the floating chat widget (the blue bubble + popup panel).
+ * This is what users see and type into.
+ * It reads/writes conversation history from sessionStorage so messages
+ * survive page refreshes during the same browser session.
+ */
 function buildChatWidget() {
   const root = document.createElement('section');
   root.className = 'cedars-chat';
@@ -64,7 +80,7 @@ function buildChatWidget() {
       <header class="cedars-chat__header">
         <div>
           <p class="cedars-chat__title">Cedars Assistant</p>
-          <p class="cedars-chat__subtitle">Menu, allergens, dietary, hours, location</p>
+          <p class="cedars-chat__subtitle">Menu • Ingredients • Dietary • Recommendations • Hours</p>
         </div>
         <button type="button" class="cedars-chat__close" id="cedars-chat-close" aria-label="Close chat">×</button>
       </header>
@@ -74,7 +90,7 @@ function buildChatWidget() {
           id="cedars-chat-input"
           type="text"
           maxlength="1000"
-          placeholder="Ask about menu, allergens, dietary options..."
+          placeholder="Ask about dishes, ingredients, dietary options, or just say hi!"
           required
         />
         <button type="submit">Send</button>
@@ -112,7 +128,7 @@ function buildChatWidget() {
   const renderHistory = () => {
     messages.innerHTML = '';
     if (history.length === 0) {
-      addMessage('assistant', 'Hello! Ask me about Cedars of Lebanon menu items, ingredients, allergens, dietary options, opening hours, or location.');
+      addMessage('assistant', "Hello 👋 Welcome! I'm here to help you explore our Lebanese menu and find meals you'll love.");
       return;
     }
     history.forEach((entry) => addMessage(entry.role, entry.content, entry.createdAt));
@@ -158,14 +174,21 @@ function buildChatWidget() {
     return normalized;
   };
 
+  // Toggle panel open/closed when clicking the floating bubble.
   if (toggle && panel) {
     toggle.addEventListener('click', () => {
       const open = panel.classList.contains('hidden');
       panel.classList.toggle('hidden', !open);
       toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-      if (open && input) input.focus();
+      if (open) {
+        if (input) input.focus();
+        // Scroll to the newest message every time the chat is reopened.
+        messages.scrollTop = messages.scrollHeight;
+      }
     });
   }
+
+  // Close button inside the chat header.
   if (closeBtn && panel && toggle) {
     closeBtn.addEventListener('click', () => {
       panel.classList.add('hidden');
@@ -173,6 +196,7 @@ function buildChatWidget() {
     });
   }
 
+  // Handle the user pressing "Send" (or Enter) in the chat form.
   if (form && input) {
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -183,10 +207,14 @@ function buildChatWidget() {
 
       isWaiting = true;
       input.value = '';
+
+      // Show the user's message immediately in the chat window.
       pushAndPersist('user', message);
+      // Show "Typing..." while waiting for the backend reply.
       setTyping(true);
 
       try {
+        // Send the message + recent conversation history to the Laravel backend.
         const payloadHistory = buildPayloadHistory(history, message);
 
         const response = await fetch(`${window.APP_CONFIG.API_BASE_URL}/ai/chat`, {
@@ -253,14 +281,14 @@ const FALLBACK_NAV_HTML = `
       <a class="nav-item" data-nav-link href="contact.html">Contact</a>
       <span id="auth-slot"></span>
       <a
-        class="nav-item"
+        class="nav-item nav-item--contact-cta"
         href="https://wa.me/9613444111"
         target="_blank"
         rel="noopener noreferrer"
-        aria-label="Contact us on WhatsApp"
-        title="Contact us on WhatsApp"
+        aria-label="Order Now on WhatsApp"
+        title="Order Now on WhatsApp"
       >
-        Contact Us
+        Order Now
       </a>
     </div>
   </nav>
