@@ -25,58 +25,9 @@ function setBox(id, text) {
   el.classList.remove('hidden');
 }
 
-function setMode(mode) {
-  const flip = document.getElementById('auth-flip');
-  if (!flip) return;
-  flip.classList.toggle('is-forgot', mode === 'forgot');
-
-  // clear status boxes when switching
-  setBox('admin-login-error', '');
-  setBox('admin-login-info', '');
-  setBox('admin-forgot-error', '');
-  setBox('admin-forgot-info', '');
-}
-
-function currentModeFromHash() {
-  return String(window.location.hash || '').toLowerCase().includes('forgot') ? 'forgot' : 'login';
-}
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Initial mode (apply instantly without the flip animation so it loads like the sign-in state).
-  const flip = document.getElementById('auth-flip');
-  const initialMode = currentModeFromHash();
-
-  if (flip) {
-    flip.classList.add('no-transition');
-    setMode(initialMode);
-
-    // Force style recalc so the browser commits the state without animating.
-    void flip.offsetHeight;
-
-    flip.classList.remove('no-transition');
-  } else {
-    setMode(initialMode);
-  }
-
-  window.addEventListener('hashchange', () => {
-    setMode(currentModeFromHash());
-  });
-
-  const showForgotBtn = document.getElementById('show-forgot');
-  const showLoginBtn = document.getElementById('show-login');
   const backToSiteBtn = document.getElementById('back-to-site');
-
-  if (showForgotBtn) {
-    showForgotBtn.addEventListener('click', () => {
-      window.location.hash = 'forgot';
-    });
-  }
-
-  if (showLoginBtn) {
-    showLoginBtn.addEventListener('click', () => {
-      window.location.hash = 'login';
-    });
-  }
 
   if (backToSiteBtn) {
     backToSiteBtn.addEventListener('click', () => {
@@ -85,9 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   const loginForm = document.getElementById('admin-login-form');
-  const forgotForm = document.getElementById('admin-forgot-form');
   const loginSubmit = document.getElementById('admin-login-submit');
-  const forgotSubmit = document.getElementById('admin-forgot-submit');
 
   if (loginForm) {
     loginForm.addEventListener('submit', async (e) => {
@@ -162,43 +111,4 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  if (forgotForm) {
-    forgotForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-
-      const fd = new FormData(forgotForm);
-      const payload = { email: String(fd.get('email') || '').trim() };
-
-      try {
-        setBox('admin-forgot-error', '');
-        setBox('admin-forgot-info', '');
-
-        if (forgotSubmit) {
-          forgotSubmit.disabled = true;
-          forgotSubmit.textContent = 'Sending...';
-        }
-
-        const res = await fetch(`${API_BASE_URL}/auth/forgot-password`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
-        });
-
-        if (!res.ok) throw new Error('Could not send reset email');
-
-        setBox(
-          'admin-forgot-info',
-          "If an account exists for this email, you’ll receive a password reset link shortly. Please check your inbox.",
-        );
-      } catch (err) {
-        console.warn(err);
-        setBox('admin-forgot-error', err && err.message ? err.message : 'Request failed');
-      } finally {
-        if (forgotSubmit) {
-          forgotSubmit.disabled = false;
-          forgotSubmit.textContent = 'Send reset link';
-        }
-      }
-    });
-  }
 });

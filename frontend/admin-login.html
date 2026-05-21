@@ -7,11 +7,11 @@
   <link rel="icon" type="image/jpeg" href="assets/media/site-logo-chef.jpg" />
   <link rel="stylesheet" href="global.css" />
 </head>
-<body class="min-h-screen flex flex-col">
+<body style="height:100vh; overflow:hidden;">
   <div id="navbar"></div>
 
-  <main class="bg-transparent flex-1 flex" style="flex:1 0 auto;display:flex;">
-    <div class="mx-auto flex w-full max-w-6xl items-center justify-center px-4 py-12">
+  <main class="bg-transparent" style="min-height:calc(100vh - 57px - 49px); display:flex; align-items:center; justify-content:center;">
+    <div class="mx-auto flex w-full max-w-6xl items-center justify-center px-4 py-10">
       <div class="relative w-full max-w-4xl auth-perspective">
         <div id="auth-flip" class="auth-flip">
           <!-- Login Side (Front) -->
@@ -56,13 +56,6 @@
                     class="login-input mt-1 w-full rounded-md border border-subtle bg-transparent px-3 py-2 shadow-sm focus:border-[var(--accent)] focus:outline-none"
                     required
                   />
-                  <button
-                    type="button"
-                    id="show-forgot"
-                    class="mt-2 text-xs font-medium text-[var(--accent)] hover:underline"
-                  >
-                    Forgot password?
-                  </button>
                 </div>
 
                 <div class="flex items-center gap-2 text-xs text-muted-soft">
@@ -89,54 +82,6 @@
             </div>
           </div>
 
-          <!-- Forgot Password Side (Back) -->
-          <div class="surface-card overflow-hidden rounded-3xl border border-subtle shadow-2xl md:grid md:grid-cols-2 auth-side back">
-            <!-- Left brand panel -->
-            <div class="relative hidden md:flex flex-col justify-between overflow-hidden p-10 text-white">
-              <div class="auth-brand-bg absolute inset-0 bg-gradient-to-br from-[var(--accent-secondary)] via-[var(--accent)] to-[var(--accent-secondary)]"></div>
-              <div class="auth-brand-glow absolute inset-0 opacity-25 [background:radial-gradient(circle_at_top_left,rgba(255,255,255,0.7),transparent_55%)]"></div>
-              <div class="relative z-10">
-                <p class="text-xs font-semibold uppercase tracking-[0.25em] text-white/85">Cedars of Lebanon</p>
-                <h1 class="mt-4 text-3xl font-semibold tracking-tight">Password Reset</h1>
-                <p class="mt-2 text-sm text-white/85 max-w-xs">Enter your email to receive a password reset link.</p>
-              </div>
-              <p class="relative z-10 text-xs text-white/75">Secure admin access for the Cedars of Lebanon dashboard.</p>
-            </div>
-
-            <!-- Right form panel -->
-            <div class="p-8 sm:p-10">
-              <p class="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--accent)]">Admin access</p>
-              <h2 class="mt-2 text-2xl font-semibold tracking-tight text-white">Forgot password</h2>
-              <p class="mt-1 text-sm text-muted-soft">Enter your admin email and we'll send a password reset link.</p>
-
-              <p id="admin-forgot-error" class="hidden mt-4 rounded-md border border-red-500/40 bg-red-500/5 px-3 py-2 text-xs text-red-500"></p>
-              <p id="admin-forgot-info" class="hidden mt-4 rounded-md border border-emerald-500/40 bg-emerald-500/5 px-3 py-2 text-xs text-emerald-600 dark:text-emerald-400"></p>
-
-              <form id="admin-forgot-form" class="mt-6 space-y-4 text-sm">
-                <div>
-                  <label class="block text-xs font-medium text-muted-soft uppercase tracking-[0.16em]">Admin email</label>
-                  <input
-                    name="email"
-                    type="email"
-                    class="login-input mt-1 w-full rounded-md border border-subtle bg-transparent px-3 py-2 shadow-sm focus:border-[var(--accent)] focus:outline-none"
-                    required
-                  />
-                </div>
-
-                <button
-                  id="admin-forgot-submit"
-                  type="submit"
-                  class="btn btn-primary w-full disabled:cursor-not-allowed disabled:opacity-70"
-                >
-                  Send reset link
-                </button>
-
-                <button id="show-login" type="button" class="btn btn-outline w-full">
-                  Back to sign in
-                </button>
-              </form>
-            </div>
-          </div>
         </div>
       </div>
     </div>
