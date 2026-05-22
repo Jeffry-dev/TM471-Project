@@ -471,52 +471,31 @@ function renderAuthLinks() {
 // Cache-busting / versioning for partial fetches.
 const ASSET_VERSION = '20260131-1';
 
-// Disable the page curtain effect - using smooth blur/scale transitions for navigation instead.
-const ENABLE_PAGE_CURTAIN = false;
-
-function ensureCurtain() {
-  if (!ENABLE_PAGE_CURTAIN) return;
-  if (!document.body) return;
-  if (document.getElementById('page-curtain')) return;
-  const el = document.createElement('div');
-  el.id = 'page-curtain';
-  el.innerHTML = '<div class="curtain left"></div><div class="curtain right"></div>';
-  document.body.appendChild(el);
-}
-
-function showCurtain() {
-  if (!ENABLE_PAGE_CURTAIN) return;
-
-  // Curtains are hidden by default and only animate IN (close) during navigation.
-  ensureCurtain();
-  const el = document.getElementById('page-curtain');
-  if (!el) return;
-
-  el.classList.add('is-active', 'is-closing');
-}
-
 const PAGE_TRANSITION_KEY = '__page_transition__';
 const CHAT_STORAGE_KEY = 'cedars_ai_chat_history_v1';
 
-function navigateWithTransition(href, delayMs = 300) {
-  // Trigger page exit animation and navigate to the new page.
-  try {
-    sessionStorage.setItem(PAGE_TRANSITION_KEY, '1');
-  } catch {
-    // ignore
+// Fade the body in as soon as possible — body starts at opacity:0 in CSS.
+(function fadeInPage() {
+  function show() {
+    document.body.classList.add('page-visible');
   }
+  if (document.body) {
+    show();
+  } else {
+    document.addEventListener('DOMContentLoaded', show, { once: true });
+  }
+})();
 
-  document.body.classList.add('page-exit');
-  showCurtain();
-
+function navigateWithTransition(href) {
+  // Fade body out, then navigate. html background (#080a0c) stays visible — no black flash.
+  document.body.classList.remove('page-visible');
+  document.body.classList.add('page-leaving');
   window.setTimeout(() => {
     window.location.href = href;
-  }, delayMs);
+  }, 170);
 }
 
 function bindPageTransitions() {
-  ensureCurtain();
-
   document.addEventListener('click', (e) => {
     const a = e.target && e.target.closest ? e.target.closest('a') : null;
     if (!a) return;
@@ -524,34 +503,17 @@ function bindPageTransitions() {
     const href = a.getAttribute('href') || '';
     const target = a.getAttribute('target');
 
-    // Only intercept internal .html navigations.
     const isHtml = href.endsWith('.html');
     const isExternal = href.startsWith('http://') || href.startsWith('https://') || href.startsWith('mailto:');
     if (!isHtml || isExternal || target === '_blank') return;
 
     e.preventDefault();
-
-    navigateWithTransition(href, 470);
+    navigateWithTransition(href);
   });
 }
 
 function bindPageEnterTransition() {
-  // Apply page enter animation synchronously to ensure smooth transitions
-  // and prevent lag caused by other scripts.
-  document.body.classList.add('page-enter');
-
-  // Force reflow so the browser commits the initial state before enabling transitions.
-  void document.body.offsetHeight;
-
-  document.body.classList.add('page-enter-active');
-
-  // Remove the pre-paint helper class once the transition is running.
-  document.documentElement.classList.remove('page-transition-enter');
-
-  window.setTimeout(() => {
-    document.body.classList.remove('page-enter', 'page-enter-active');
-    document.documentElement.classList.remove('page-transition-enter');
-  }, 420);
+  // No-op — fade-in is handled by the IIFE above which runs immediately.
 }
 
 function bindRevealOnScroll() {
