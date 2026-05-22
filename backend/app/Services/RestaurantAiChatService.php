@@ -23,6 +23,7 @@ namespace App\Services;
 
 use App\Models\Category;
 use App\Models\MenuItem;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 
@@ -30,6 +31,8 @@ class RestaurantAiChatService
 {
 
     private const MISSING_INFO_MESSAGE = 'I don’t have verified information for that yet.';
+    private const CONTEXT_CACHE_KEY = 'ai:chat:context';
+    private const CONTEXT_CACHE_TTL_SECONDS = 30;
 
     /**
      * @param  array<int, array{role: string, content: string}>  $history
@@ -55,7 +58,15 @@ class RestaurantAiChatService
             return ['reply' => "Hey there! I'm here to help with our Lebanese menu, ingredients, allergens, dietary options, hours, and location. What would you like to know? 😊"];
         }
 
-        // Build a fresh snapshot of the restaurant menu, hours, and location from the database.
+        // Cheap small-talk pre-check before touching the database. Lets greetings
+        // like "hi" / "thanks" return instantly with zero DB load.
+        $earlySmallTalk = $this->smallTalkReply($cleanMessage);
+        if ($earlySmallTalk !== null) {
+            return ['reply' => $earlySmallTalk];
+        }
+
+        // Build a snapshot of the restaurant menu, hours, and location.
+        // Cached for 30s to match the menu/category controller cache TTL.
         $context = $this->buildContext();
 
         // Try to answer instantly without calling the expensive AI API.
@@ -63,7 +74,7 @@ class RestaurantAiChatService
         if ($directReply !== null) {
             return ['reply' => $directReply];
         }
-
+        // Read the Key from config
         $apiKey = (string) config('services.llm.api_key', '');
         if ($apiKey === '') {
             throw new \RuntimeException('LLM_API_KEY is missing');
@@ -71,7 +82,7 @@ class RestaurantAiChatService
 
         $messages = [];
         $messages[] = ['role' => 'system', 'content' => $this->runtimeSystemPrompt()];
-        $messages[] = ['role' => 'system', 'content' => "Verified restaurant context (JSON):\n".$this->jsonEncode($context)];
+        $messages[] = ['role' => 'system', 'content' => "Verified restaurant context (JSON):\n".$this->jsonEncode($this->compactContextForLlm($context))];
         $messages[] = ['role' => 'system', 'content' => 'If user asks for data not present in context, respond exactly: “'.self::MISSING_INFO_MESSAGE.'”'];
 
         foreach ($this->sanitizeHistory($history) as $pastMessage) {
@@ -79,7 +90,7 @@ class RestaurantAiChatService
         }
 
         $messages[] = ['role' => 'user', 'content' => $cleanMessage];
-
+        // Read the Model
         $baseUrl = rtrim((string) config('services.llm.base_url', 'https://api.groq.com/openai/v1'), '/');
         $model = (string) config('services.llm.model', 'llama-3.3-70b-versatile');
 
@@ -88,12 +99,14 @@ class RestaurantAiChatService
             'temperature' => 0.1,
             'messages' => $messages,
         ];
+        // 600 tokens ≈ 400-450 words — enough for a detailed dish description
+        // or a multi-item recommendation without mid-sentence truncation.
         if (str_contains(Str::lower($baseUrl), 'groq.com')) {
-            $payload['max_completion_tokens'] = 350;
+            $payload['max_completion_tokens'] = 600;
         } else {
-            $payload['max_tokens'] = 350;
+            $payload['max_tokens'] = 600;
         }
-
+        // call the API Key
         $response = Http::timeout((int) config('services.llm.timeout_seconds', 20))
             ->withToken($apiKey)
             ->acceptJson()
@@ -477,11 +490,15 @@ PROMPT;
                 return self::MISSING_INFO_MESSAGE;
             }
 
-            $matching = array_shift($candidateLists);
-            foreach ($candidateLists as $list) {
-                $matching = array_values(array_intersect($matching, $list));
+            // Intersect all preference lists to find dishes that satisfy every preference.
+            $matching = $candidateLists[0];
+            for ($i = 1, $count = count($candidateLists); $i < $count; $i++) {
+                $matching = array_values(array_intersect($matching, $candidateLists[$i]));
             }
 
+            // Fallback: if no dish satisfies every preference, fall back to the union
+            // so the user still gets relevant suggestions (covers ALL preference lists,
+            // not just the tail — fixes a bug where the first list was dropped).
             if (empty($matching)) {
                 $matching = array_values(array_unique(array_merge(...$candidateLists)));
             }
@@ -523,6 +540,12 @@ PROMPT;
         };
     }
 
+    /**
+     * Detect a "small talk" intent. Patterns are intentionally anchored to the
+     * full normalized message (with optional trailing politeness words/punctuation)
+     * so that a message like "thanks, how much is the falafel?" does NOT hijack
+     * the menu-detail intent — it should fall through to price lookup.
+     */
     private function detectSmallTalkIntent(string $message): ?string
     {
         $normalized = $this->normalizeIntentText($message);
@@ -530,27 +553,28 @@ PROMPT;
             return null;
         }
 
-        if (preg_match('/^(h+i+|he+y+|hello+|good morning|good afternoon|good evening|yo+|salam+|marhaba+)$/u', $normalized) === 1) {
-            return 'greeting';
-        }
-
-        if (preg_match('/^(thanks|thank you|thank you so much|thanks a lot|thx|ty|appreciate it|much appreciated)$/u', $normalized) === 1) {
-            return 'thanks';
-        }
-
-        if (preg_match('/^(bye|goodbye|see you|see ya|later|talk to you later)$/u', $normalized) === 1) {
-            return 'goodbye';
-        }
-
-        if (preg_match('/^(how are you|how are you doing|how is it going|how s it going)$/u', $normalized) === 1) {
+        // Check how_are_you before greeting so "hi how are you" → how_are_you.
+        if (preg_match('/^(hi|hey|hello|yo)?\s*(how are you|how are you doing|how is it going|how s it going|how do you do)[\s!.,?]*$/u', $normalized) === 1) {
             return 'how_are_you';
         }
 
-        if (preg_match('/^(ok|okay|cool|great|awesome|nice|perfect)$/u', $normalized) === 1) {
+        if (preg_match('/^(h+i+|he+y+|hello+|good morning|good afternoon|good evening|yo+|salam+|marhaba+)(\s+(there|everyone|all|friend|guys|team))?[\s!.,]*$/u', $normalized) === 1) {
+            return 'greeting';
+        }
+
+        if (preg_match('/^(thanks|thank you|thank you so much|thanks a lot|thx|ty|appreciate it|much appreciated)[\s!.,]*$/u', $normalized) === 1) {
+            return 'thanks';
+        }
+
+        if (preg_match('/^(bye|goodbye|see you|see ya|later|talk to you later|cya|good night|goodnight)[\s!.,]*$/u', $normalized) === 1) {
+            return 'goodbye';
+        }
+
+        if (preg_match('/^(ok|okay|k|cool|great|awesome|nice|perfect|sounds good|got it)[\s!.,]*$/u', $normalized) === 1) {
             return 'acknowledgement';
         }
 
-        if (preg_match('/^(i am hungry|i\'m hungry|hungry|starving)$/u', $normalized) === 1) {
+        if (preg_match('/^(i am hungry|i m hungry|im hungry|hungry|so hungry|very hungry|starving|famished)[\s!.,]*$/u', $normalized) === 1) {
             return 'hungry';
         }
 
@@ -575,39 +599,87 @@ PROMPT;
      */
     private function buildContext(): array
     {
-        $menuItems = MenuItem::query()
-            ->with('categoryRef')
-            ->orderBy('name')
-            ->get()
-            ->map(function (MenuItem $item) {
-                return [
-                    'name' => $item->name,
-                    'category' => $item->categoryRef?->name ?? $item->category,
-                    'price' => (float) $item->price,
-                    'description' => $item->description ?: null,
-                    'is_available' => (bool) $item->is_available,
-                    'ingredients' => $this->cleanList($item->ingredients),
-                    'allergens' => $this->cleanList($item->allergens),
-                    'dietary_tags' => $this->cleanList($item->dietary_tags),
-                ];
-            })
-            ->all();
+        return Cache::remember(self::CONTEXT_CACHE_KEY, self::CONTEXT_CACHE_TTL_SECONDS, function (): array {
+            $menuItems = MenuItem::query()
+                ->with('categoryRef')
+                ->orderBy('name')
+                ->get()
+                ->map(function (MenuItem $item) {
+                    return [
+                        'name' => $item->name,
+                        'category' => $item->categoryRef?->name ?? $item->category,
+                        'price' => (float) $item->price,
+                        'description' => $item->description ?: null,
+                        'is_available' => (bool) $item->is_available,
+                        'ingredients' => $this->cleanList($item->ingredients),
+                        'allergens' => $this->cleanList($item->allergens),
+                        'dietary_tags' => $this->cleanList($item->dietary_tags),
+                    ];
+                })
+                ->all();
 
-        $categories = Category::query()
-            ->orderBy('name')
-            ->pluck('name')
-            ->all();
+            $categories = Category::query()
+                ->orderBy('name')
+                ->pluck('name')
+                ->all();
+
+            return [
+                'restaurant' => [
+                    'name' => config('restaurant.name', 'Cedars of Lebanon'),
+                    'location' => config('restaurant.location', []),
+                    'contact' => config('restaurant.contact', []),
+                    'hours' => config('restaurant.hours', []),
+                ],
+                'categories' => $categories,
+                'menu_items' => $menuItems,
+                'recommendation_candidates' => $this->buildRecommendationCandidates($menuItems),
+            ];
+        });
+    }
+
+    /**
+     * Forget the cached context so the next AI request rebuilds from the database.
+     * Called by menu/category controllers after writes.
+     */
+    public static function forgetContextCache(): void
+    {
+        Cache::forget(self::CONTEXT_CACHE_KEY);
+    }
+
+    /**
+     * Trim the context before sending it to the LLM.
+     *
+     * The full context (with long descriptions and recommendation candidate maps)
+     * is useful locally for direct-intent matching, but bloats the LLM payload.
+     * For the LLM we keep only what it needs to answer questions: per-item name,
+     * category, price, availability, short description, ingredients, allergens,
+     * and dietary tags. Unavailable items are dropped.
+     */
+    private function compactContextForLlm(array $context): array
+    {
+        $items = [];
+        foreach ($context['menu_items'] ?? [] as $item) {
+            if (! is_array($item)) {
+                continue;
+            }
+            if (! ($item['is_available'] ?? true)) {
+                continue;
+            }
+            $items[] = [
+                'name' => $item['name'] ?? '',
+                'category' => $item['category'] ?? '',
+                'price' => $item['price'] ?? 0,
+                'description' => Str::limit((string) ($item['description'] ?? ''), 200, ''),
+                'ingredients' => $item['ingredients'] ?? [],
+                'allergens' => $item['allergens'] ?? [],
+                'dietary_tags' => $item['dietary_tags'] ?? [],
+            ];
+        }
 
         return [
-            'restaurant' => [
-                'name' => config('restaurant.name', 'Cedars of Lebanon'),
-                'location' => config('restaurant.location', []),
-                'contact' => config('restaurant.contact', []),
-                'hours' => config('restaurant.hours', []),
-            ],
-            'categories' => $categories,
-            'menu_items' => $menuItems,
-            'recommendation_candidates' => $this->buildRecommendationCandidates($menuItems),
+            'restaurant' => $context['restaurant'] ?? [],
+            'categories' => $context['categories'] ?? [],
+            'menu_items' => $items,
         ];
     }
 

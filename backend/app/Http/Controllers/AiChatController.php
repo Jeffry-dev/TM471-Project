@@ -77,20 +77,12 @@ class AiChatController extends Controller
         }
 
         $retryAfterSeconds = $this->extractRetryAfterSeconds($details);
-        $upgradeUrl = $this->extractUpgradeUrl($details);
 
-        $message = 'Sorry, I’m having trouble right now.';
         if ($retryAfterSeconds !== null) {
-            $message .= ' Please try again in '.$retryAfterSeconds.' seconds.';
-        } else {
-            $message .= ' Please try again in a moment.';
+            return 'Sorry, I’m getting a lot of questions right now. Please try again in '.$retryAfterSeconds.' seconds.';
         }
 
-        if ($upgradeUrl !== null) {
-            $message .= ' Need more tokens? Upgrade here: '.$upgradeUrl;
-        }
-
-        return $message;
+        return 'Sorry, I’m getting a lot of questions right now. Please try again in a moment.';
     }
 
     private function extractRetryAfterSeconds(string $details): ?int
@@ -104,26 +96,5 @@ class AiChatController extends Controller
         }
 
         return null;
-    }
-
-    private function extractUpgradeUrl(string $details): ?string
-    {
-        if (preg_match_all('/https?:\/\/[^\s)]+/i', $details, $matches) < 1) {
-            return null;
-        }
-
-        $urls = array_map(
-            static fn (string $url): string => rtrim($url, '.,;'),
-            $matches[0]
-        );
-
-        foreach ($urls as $url) {
-            $normalizedUrl = strtolower($url);
-            if (str_contains($normalizedUrl, 'billing') || str_contains($normalizedUrl, 'upgrade')) {
-                return $url;
-            }
-        }
-
-        return $urls[0] ?? null;
     }
 }

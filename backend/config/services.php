@@ -34,6 +34,7 @@ return [
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
+    // My AI key sended from .env
     'llm' => [
         'api_key' => env('LLM_API_KEY'),
         'base_url' => env('LLM_BASE_URL', 'https://api.groq.com/openai/v1'),

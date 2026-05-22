@@ -80,16 +80,6 @@ class AuthController extends Controller
 
         return $this->toApiUser($user->fresh());
     }
-    // forgot password endpoint that accepts an email address and sends a password reset link if the user exists, but does not reveal whether the user exists or not.
-    public function forgotPassword(Request $request)
-    {
-        // Do not reveal whether user exists.
-        $request->validate([
-            'email' => ['required', 'email'],
-        ]);
-
-        return ['ok' => true];
-    }
     // toapiuser and toapiloginuser functions that convert a User model instance to an array suitable for API responses, with the appropriate fields for each case.
     private function toApiUser(User $user): array
     {

@@ -27,7 +27,6 @@ Route::post('/ai/chat', AiChatController::class)->middleware(['visitor.track', '
 // Authentication endpoints for admin users to log in and manage the menu, categories, and contact messages. Apply authentication middleware to protect these endpoints and ensure that only authenticated admin users can access them.
 Route::prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
-    Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
 
     Route::middleware('auth:sanctum')->group(function () {
         // me endpoint that returns the currently authenticated user's information.

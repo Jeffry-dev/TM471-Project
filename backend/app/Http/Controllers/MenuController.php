@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 
 use App\Models\MenuItem;
+use App\Services\RestaurantAiChatService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema;
@@ -97,6 +98,7 @@ class MenuController extends Controller
         $item = MenuItem::create($payload)->load('categoryRef');
 
         Cache::forget('menu:index:all');
+        RestaurantAiChatService::forgetContextCache();
 
         return response()->json($this->toApi($item), 201);
     }
@@ -168,6 +170,7 @@ class MenuController extends Controller
         $item->update($updates);
 
         Cache::forget('menu:index:all');
+        RestaurantAiChatService::forgetContextCache();
 
         return $this->toApi($item->fresh(['categoryRef']));
     }
@@ -183,6 +186,7 @@ class MenuController extends Controller
         $item->delete();
 
         Cache::forget('menu:index:all');
+        RestaurantAiChatService::forgetContextCache();
 
         return ['deleted' => true];
     }
